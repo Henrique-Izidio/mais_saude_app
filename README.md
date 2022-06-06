@@ -6,5 +6,6 @@ A new Flutter project.
 
 ## Bugs e objetivos do projeto  
 
-**Componentização**  
+**Componentização-EventList**  
 
+Ao tentar componentizar a lista de eventos da HomePage está ocorrendo um erro

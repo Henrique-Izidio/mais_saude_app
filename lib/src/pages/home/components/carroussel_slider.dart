@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 // ignore: must_be_immutable
 class Caroussel extends StatelessWidget {
-  
+
   var listSlide = [
     Colors.blue,
     Colors.green,
@@ -15,14 +15,16 @@ class Caroussel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double wSize = MediaQuery.of(context).size.width;
+    double hSize = wSize <= 300 ? 175 : wSize/3.5;
     return SliverList(
       delegate: SliverChildListDelegate([
         CarouselSlider(
-          options: CarouselOptions(height: 175),
+          options: CarouselOptions(height: hSize),
           items: [0, 1, 2].map((currentSlide) {
             return Builder(builder: (context) {
               return Container(
-                width: MediaQuery.of(context).size.width,
+                width: wSize,
                 margin: const EdgeInsets.symmetric(horizontal: 5.0),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),

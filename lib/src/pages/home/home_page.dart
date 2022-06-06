@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:mais_saude_app/src/pages/home/components/carroussel_slider.dart';
+import 'package:mais_saude_app/src/pages/home/components/event_list.dart';
 import 'package:mais_saude_app/src/widgets/drawer.dart';
 import 'package:mais_saude_app/src/widgets/separator.dart';
 
@@ -55,6 +56,7 @@ class _HomePageState extends State<HomePage> {
                 const Separator(isSliver: true, isColumn: false, value: 15.0),
                 Caroussel(),
                 const Separator(isSliver: true, isColumn: false, value: 15.0),
+                // EventList.buildList(snapshot)
                 listEvent(snapshot)
               ],
             );
@@ -91,8 +93,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // *area de codigo destinada a criação da lista de
-  // *dados a partir do firebase
+// *area de codigo destinada a criação da lista de
+// *dados a partir do firebase
   listEvent(snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
@@ -142,7 +144,6 @@ class _HomePageState extends State<HomePage> {
                                           .collection('events')
                                           .doc(doc.id)
                                           .delete();
-                                      // ignore: use_build_context_synchronously
                                       Navigator.of(context).pop();
                                     },
                                     label: const Text('Delete'),

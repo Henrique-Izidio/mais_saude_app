@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 class EventList {
-  static listEvent(snapshot) {
+  buildList(snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
       case ConnectionState.waiting:

@@ -28,7 +28,7 @@ class Separator extends StatelessWidget {
   Widget spacer() {
     if (isColumn) {
       return SizedBox(
-        height: value,
+        width: value,
       );
     } else {
       return SizedBox(
