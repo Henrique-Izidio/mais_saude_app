@@ -1,8 +1,9 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
 import 'package:mais_saude_app/src/widgets/separator.dart';
+// import 'package:mais_saude_app/constants/firebase_const.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mais_saude_app/globals.dart';
 
 class SingUp extends StatefulWidget {
   const SingUp({Key? key}) : super(key: key);
@@ -13,11 +14,11 @@ class SingUp extends StatefulWidget {
 
 class _SingUpState extends State<SingUp> {
   final GlobalKey<FormState> _singUpKey = GlobalKey<FormState>();
-  final FirebaseAuth auth = FirebaseAuth.instance;
+  // final FirebaseAuth auth = FirebaseAuth.instance;
 
-  String errorMensage = '';
-  String email = '';
-  String password = '';
+  late String errorMensage;
+  late String email;
+  late String password;
 
   @override
   Widget build(BuildContext context) {

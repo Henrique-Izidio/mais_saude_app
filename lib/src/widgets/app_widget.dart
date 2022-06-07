@@ -2,26 +2,35 @@ import 'package:flutter/material.dart';
 
 import 'package:mais_saude_app/src/pages/home/home_page.dart';
 import 'package:mais_saude_app/src/pages/singin/SingIn.dart';
+import 'package:mais_saude_app/src/pages/singin/singIn_controller.dart';
 import 'package:mais_saude_app/src/pages/singup/SingUp.dart';
+import 'package:provider/provider.dart';
 
 class AppWidget extends StatelessWidget {
-  const AppWidget ({Key? key}) : super(key: key);
+  const AppWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiProvider(
 
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => SingInController(),
+        ),
+        // ChangeNotifierProvider(create: (context) => UserModel(),),
+      ],
+      
+      child: MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        initialRoute: '/',
+        routes: {
+          '/': (_) => const SingIn(),
+          '/home': (_) => const HomePage(),
+          '/singUp': (_) => const SingUp(),
+        },
       ),
-
-      initialRoute: '/',
-
-      routes: {
-        '/' : (_) => const SingIn(),
-        '/home' : (_) => const HomePage(),
-        '/singUp' : (_) => const SingUp(),
-      },
     );
   }
 }

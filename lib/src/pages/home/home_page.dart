@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:mais_saude_app/src/pages/home/components/carroussel_slider.dart';
-import 'package:mais_saude_app/src/pages/home/components/event_list.dart';
 import 'package:mais_saude_app/src/widgets/drawer.dart';
 import 'package:mais_saude_app/src/widgets/separator.dart';
 
