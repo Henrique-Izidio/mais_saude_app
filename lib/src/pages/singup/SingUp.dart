@@ -30,7 +30,20 @@ class _SingUpState extends State<SingUp> {
 
     controller.addListener(() {
       if (controller.loadState == AuthState.sucess) {
-      } else if (controller.loadState == AuthState.error) {}
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('deu certo'),
+            // content: Text('eror ao conectar'),
+          ),
+        );
+      } else if (controller.loadState == AuthState.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(controller.errorMessage),
+            // content: Text('eror ao conectar'),
+          ),
+        );
+      }
     });
   }
 
