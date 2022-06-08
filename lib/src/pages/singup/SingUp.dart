@@ -1,8 +1,11 @@
 // ignore_for_file: file_names
 import 'package:flutter/material.dart';
-import 'package:mais_saude_app/src/widgets/separator.dart';
-// import 'package:mais_saude_app/constants/firebase_const.dart';
+import 'package:provider/provider.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+
+import 'package:mais_saude_app/src/widgets/separator.dart';
+import 'package:mais_saude_app/src/pages/singup/singUp_controller.dart';
 import 'package:mais_saude_app/globals.dart';
 
 class SingUp extends StatefulWidget {
@@ -14,14 +17,27 @@ class SingUp extends StatefulWidget {
 
 class _SingUpState extends State<SingUp> {
   final GlobalKey<FormState> _singUpKey = GlobalKey<FormState>();
-  // final FirebaseAuth auth = FirebaseAuth.instance;
 
-  late String errorMensage;
-  late String email;
-  late String password;
+  late final String name;
+  late final String email;
+  late final String password;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final controller = context.read<SingUpController>();
+
+    controller.addListener(() {
+      if (controller.loadState == AuthState.sucess) {
+      } else if (controller.loadState == AuthState.error) {}
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<SingUpController>();
+
     return Scaffold(
       body: SafeArea(
         child: SizedBox(
@@ -38,80 +54,74 @@ class _SingUpState extends State<SingUp> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           TextFormField(
-                            keyboardType: TextInputType.emailAddress,
                             decoration: InputDecoration(
-                                labelText: 'E-Mail',
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30))),
-                            validator: (emailValue) {
-                              if (emailValue == null || emailValue.isEmpty) {
-                                return 'Preencha com um email valido';
-                              }
-                              email = emailValue;
-                              return null;
+                              labelText: 'Nome',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            onChanged: (nameValue) {
+                              name = nameValue;
                             },
                           ),
                           const Separator(
-                              isSliver: false, isColumn: false, value: 10),
+                            isSliver: false,
+                            isColumn: false,
+                            value: 10,
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: 'E-Mail',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            onChanged: (emailValue) {
+                              email = emailValue;
+                            },
+                          ),
+                          const Separator(
+                            isSliver: false,
+                            isColumn: false,
+                            value: 10,
+                          ),
                           TextFormField(
                             obscureText: true,
                             decoration: InputDecoration(
-                                labelText: 'Senha',
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30))),
-                            validator: (passValue) {
-                              if (passValue!.length < 8) {
-                                return 'A senha é muito curta';
-                              }
-                              password = passValue;
-                              return null;
+                              labelText: 'Senha',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            onChanged: (passValue) {
+                              email = passValue;
                             },
                           ),
                           const Separator(
-                              isSliver: false, isColumn: false, value: 10),
+                            isSliver: false,
+                            isColumn: false,
+                            value: 10,
+                          ),
                           ElevatedButton(
                             style: ButtonStyle(
-                                shape: MaterialStateProperty.all<
-                                        RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ))),
-                            onPressed: () async {
-                              if (_singUpKey.currentState!.validate()) {
-                                try {
-                                  await auth.createUserWithEmailAndPassword(
-                                    email: email,
-                                    password: password,
-                                  );
-                                  // ignore: use_build_context_synchronously
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Cadastro realizado com sucesso!'))
-                                  );
-                                } on FirebaseAuthException catch (erro) {
-                                  switch (erro.code) {
-                                    case 'email-already-in-use':
-                                      errorMensage =
-                                          'O email já está cadastrado';
-                                      break;
-                                    case 'network-request-failed':
-                                      errorMensage =
-                                          'Você não está conectado a internet';
-                                      break;
-                                    default:
-                                      errorMensage = erro.code;
-                                  }
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(errorMensage),
-                                    ),
-                                  );
-                                }
-                              }
-                            },
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30.0),
+                                ),
+                              ),
+                            ),
+                            onPressed: controller.loadState == AuthState.loading
+                              ? null
+                              : () {
+                                  controller.singUpAction(email, password, name);
+                                },
                             child: const Padding(
-                                padding: EdgeInsets.only(
-                                    top: 15, bottom: 15, left: 20, right: 20),
-                                child: Text('Cadastrar')),
+                              padding: EdgeInsets.only(
+                                  top: 15, bottom: 15, left: 20, right: 20),
+                              child: Text('Cadastrar'),
+                            ),
                           ),
                         ],
                       )),

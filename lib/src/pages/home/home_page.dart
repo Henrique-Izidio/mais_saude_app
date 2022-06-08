@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-    // ignore: prefer_final_fields
+  // ignore: prefer_final_fields
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -31,21 +31,16 @@ class _HomePageState extends State<HomePage> {
 
       //* Construtor do menu lateral
       drawer: DrawerConstructor(),
-
       appBar: AppBar(
         title: const Text('Demo'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                Color(0x02c8ffff),
-                Color(0x03CBFFff)
-              ],
+              colors: [Color(0x02c8ffff), Color(0x03CBFFff)],
             ),
           ),
         ),
       ),
-
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot>(
           stream: _getList(),
@@ -62,33 +57,28 @@ class _HomePageState extends State<HomePage> {
           },
         ),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentPage,
-        onTap: (value){
+        onTap: (value) {
           setState(() {
-            currentPage = value; 
-            
+            currentPage = value;
           });
         },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.maps_home_work_sharp),
             label: 'UBS',
-            
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Incio',
           ),
-
           BottomNavigationBarItem(
             icon: Icon(Icons.handshake),
             label: 'CRASS',
           )
         ],
-      )
+      ),
     );
   }
 
@@ -99,22 +89,28 @@ class _HomePageState extends State<HomePage> {
       case ConnectionState.none:
       case ConnectionState.waiting:
         return SliverList(
-            delegate: SliverChildListDelegate([
-          const Expanded(
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
-        ]));
+          delegate: SliverChildListDelegate(
+            [
+              const Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              )
+            ],
+          ),
+        );
       case ConnectionState.active:
       case ConnectionState.done:
         if (snapshot.data!.docs.isEmpty) {
           return SliverList(
-              delegate: SliverChildListDelegate([
-            const Center(
-              child: Text('nothing to see here'),
-            )
-          ]));
+            delegate: SliverChildListDelegate(
+              [
+                const Center(
+                  child: Text('nothing to see here'),
+                )
+              ],
+            ),
+          );
         }
         return SliverList(
           delegate: SliverChildBuilderDelegate(
@@ -130,40 +126,41 @@ class _HomePageState extends State<HomePage> {
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
                         showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: const Text('Delete event'),
-                                content: const Text(
-                                    'Do you want to delete this event? This action cannot be undone.'),
-                                actions: <Widget>[
-                                  ElevatedButton.icon(
-                                    onPressed: () async {
-                                      await _firestore
-                                          .collection('events')
-                                          .doc(doc.id)
-                                          .delete();
-                                      Navigator.of(context).pop();
-                                    },
-                                    label: const Text('Delete'),
-                                    icon: const Icon(Icons.delete_forever),
-                                    style: ButtonStyle(
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                Colors.red)),
-                                  ),
-                                  OutlinedButton.icon(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    icon: const Icon(Icons.cancel),
-                                    label: const Text('Cancel'),
-                                    style: TextButton.styleFrom(
-                                        primary: Colors.blue),
-                                  )
-                                ],
-                              );
-                            });
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: const Text('Delete event'),
+                              content: const Text(
+                                  'Do you want to delete this event? This action cannot be undone.'),
+                              actions: <Widget>[
+                                ElevatedButton.icon(
+                                  onPressed: () async {
+                                    await _firestore
+                                        .collection('events')
+                                        .doc(doc.id)
+                                        .delete();
+                                    Navigator.of(context).pop();
+                                  },
+                                  label: const Text('Delete'),
+                                  icon: const Icon(Icons.delete_forever),
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              Colors.red)),
+                                ),
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  icon: const Icon(Icons.cancel),
+                                  label: const Text('Cancel'),
+                                  style: TextButton.styleFrom(
+                                      primary: Colors.blue),
+                                )
+                              ],
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
@@ -176,4 +173,3 @@ class _HomePageState extends State<HomePage> {
     }
   }
 }
-

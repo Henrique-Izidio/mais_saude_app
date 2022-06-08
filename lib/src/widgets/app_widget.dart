@@ -6,6 +6,8 @@ import 'package:mais_saude_app/src/pages/singin/singIn_controller.dart';
 import 'package:mais_saude_app/src/pages/singup/SingUp.dart';
 import 'package:provider/provider.dart';
 
+import '../pages/singup/singUp_controller.dart';
+
 class AppWidget extends StatelessWidget {
   const AppWidget({Key? key}) : super(key: key);
 
@@ -16,6 +18,9 @@ class AppWidget extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (_) => SingInController(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SingUpController(),
         ),
         // ChangeNotifierProvider(create: (context) => UserModel(),),
       ],
