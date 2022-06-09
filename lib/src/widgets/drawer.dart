@@ -1,12 +1,13 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mais_saude_app/src/servises/auth_servises.dart';
 
 class DrawerConstructor extends StatelessWidget {
-  DrawerConstructor({ Key? key }) : super(key: key);
 
-  final _user = FirebaseAuth.instance.currentUser!;
+  final authServise = AuthServises();
+
+  DrawerConstructor({ Key? key }) : super(key: key);
   
   drawerTileConstructor(IconData icon, String title){
     return ListTile(
@@ -28,8 +29,8 @@ class DrawerConstructor extends StatelessWidget {
               currentAccountPicture: const CircleAvatar(
                 child: FlutterLogo(size: 42.0),
               ),
-              accountName: const Text('Flutter'),
-              accountEmail: Text(_user.email.toString()),
+              accountName: Text(authServise.userCredentials['name']),
+              accountEmail: Text(authServise.userCredentials['email']),
             ),
 
             drawerTileConstructor(Icons.person, 'Perfil'),
@@ -50,16 +51,7 @@ class DrawerConstructor extends StatelessWidget {
               leading: const Icon(Icons.logout),
               title: const Text('Sair'),
               onTap: () async{
-                await FirebaseAuth.instance.signOut();
-                FirebaseAuth.instance
-                .authStateChanges()
-                .listen((User? user) {
-                  if (user == null) {
-                    Navigator.of(context).pushReplacementNamed('/');
-                  } else {
-                    Navigator.of(context).pushReplacementNamed('/home');
-                  }
-                });
+                authServise.singOutAction();
               },
             )
           ],

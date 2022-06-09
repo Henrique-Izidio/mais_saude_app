@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mais_saude_app/src/pages/home/components/carroussel_slider.dart';
 import 'package:mais_saude_app/src/widgets/drawer.dart';
 import 'package:mais_saude_app/src/widgets/separator.dart';
+import 'package:mais_saude_app/globals.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,12 +17,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // ignore: prefer_final_fields
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
   int currentPage = 1;
 
   Stream<QuerySnapshot> _getList() {
-    return _firestore.collection('events').snapshots();
+    return firestore.collection('events').snapshots();
   }
 
   @override
@@ -135,7 +134,7 @@ class _HomePageState extends State<HomePage> {
                               actions: <Widget>[
                                 ElevatedButton.icon(
                                   onPressed: () async {
-                                    await _firestore
+                                    await firestore
                                         .collection('events')
                                         .doc(doc.id)
                                         .delete();
