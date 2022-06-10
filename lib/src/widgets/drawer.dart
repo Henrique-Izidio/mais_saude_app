@@ -1,6 +1,7 @@
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
+import 'package:mais_saude_app/src/database/firestore.dart';
 import 'package:mais_saude_app/src/servises/auth_servises.dart';
 
 class DrawerConstructor extends StatelessWidget {
@@ -29,7 +30,7 @@ class DrawerConstructor extends StatelessWidget {
               currentAccountPicture: const CircleAvatar(
                 child: FlutterLogo(size: 42.0),
               ),
-              accountName: Text(authServise.userCredentials['name']),
+              accountName: Text('d'),
               accountEmail: Text(authServise.userCredentials['email']),
             ),
 

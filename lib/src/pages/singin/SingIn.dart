@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:mais_saude_app/src/servises/auth_servises.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:mais_saude_app/globals.dart';
 
 import 'package:mais_saude_app/src/widgets/separator.dart';
 

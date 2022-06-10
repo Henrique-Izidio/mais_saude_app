@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mais_saude_app/globals.dart';
 
+enum AuthState {idle,sucess,error,loading}
+
 class AuthServises extends ChangeNotifier {
   var loadState = AuthState.idle;
   late String errorMessage;

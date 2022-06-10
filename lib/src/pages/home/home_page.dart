@@ -134,10 +134,7 @@ class _HomePageState extends State<HomePage> {
                               actions: <Widget>[
                                 ElevatedButton.icon(
                                   onPressed: () async {
-                                    await firestore
-                                        .collection('events')
-                                        .doc(doc.id)
-                                        .delete();
+                                    
                                     Navigator.of(context).pop();
                                   },
                                   label: const Text('Delete'),

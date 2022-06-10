@@ -4,7 +4,6 @@ import 'package:mais_saude_app/src/servises/auth_servises.dart';
 import 'package:provider/provider.dart';
 
 import 'package:mais_saude_app/src/widgets/separator.dart';
-import 'package:mais_saude_app/globals.dart';
 
 class SingUp extends StatefulWidget {
   const SingUp({Key? key}) : super(key: key);

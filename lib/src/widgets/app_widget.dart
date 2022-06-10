@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mais_saude_app/src/config/settings.dart';
 
 import 'package:mais_saude_app/src/pages/home/home_page.dart';
 import 'package:mais_saude_app/src/pages/singin/SingIn.dart';
@@ -12,13 +13,10 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-
       providers: [
-         ChangeNotifierProvider(
-          create: (_) => AuthServises(),
-        ),
+        ChangeNotifierProvider(create: (_) => AuthServises()),
+        ChangeNotifierProvider(create: (_) => AppSettings()),
       ],
-      
       child: MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.blue,
