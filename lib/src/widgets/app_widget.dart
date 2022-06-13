@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:mais_saude_app/src/config/settings.dart';
 
 import 'package:mais_saude_app/src/pages/home/home_page.dart';
-import 'package:mais_saude_app/src/pages/singin/SingIn.dart';
+import 'package:mais_saude_app/src/pages/singin/SingInPage.dart';
 import 'package:mais_saude_app/src/pages/singup/SingUp.dart';
-import 'package:mais_saude_app/src/servises/auth_servises.dart';
+import 'package:mais_saude_app/src/servises/auth_services.dart';
+import 'package:mais_saude_app/src/widgets/auth_check.dart';
 import 'package:provider/provider.dart';
 
 class AppWidget extends StatelessWidget {
@@ -14,7 +15,7 @@ class AppWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthServises()),
+        ChangeNotifierProvider(create: (_) => AuthServices()),
         ChangeNotifierProvider(create: (_) => AppSettings()),
       ],
       child: MaterialApp(
@@ -23,8 +24,9 @@ class AppWidget extends StatelessWidget {
         ),
         initialRoute: '/',
         routes: {
-          '/': (_) => const SingIn(),
+          '/':(_) => const AuthCheck(),
           '/home': (_) => const HomePage(),
+          '/singIn': (_) => const SingInPage(),
           '/singUp': (_) => const SingUp(),
         },
       ),

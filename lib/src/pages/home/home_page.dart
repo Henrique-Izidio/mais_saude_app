@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:mais_saude_app/src/pages/home/components/carroussel_slider.dart';
+import 'package:mais_saude_app/src/widgets/carroussel_slider.dart';
 import 'package:mais_saude_app/src/widgets/drawer.dart';
 import 'package:mais_saude_app/src/widgets/separator.dart';
-import 'package:mais_saude_app/globals.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,12 +14,12 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // ignore: prefer_final_fields
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   int currentPage = 1;
 
   Stream<QuerySnapshot> _getList() {
-    return firestore.collection('events').snapshots();
+    return firestore.collection('Events').snapshots();
   }
 
   @override
@@ -29,7 +28,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xF6F6F6ff),
 
       //* Construtor do menu lateral
-      drawer: DrawerConstructor(),
+      drawer: const DrawerConstructor(),
       appBar: AppBar(
         title: const Text('Demo'),
         flexibleSpace: Container(
@@ -49,8 +48,7 @@ class _HomePageState extends State<HomePage> {
                 const Separator(isSliver: true, isColumn: false, value: 15.0),
                 Caroussel(),
                 const Separator(isSliver: true, isColumn: false, value: 15.0),
-                // EventList.buildList(snapshot)
-                listEvent(snapshot)
+                listEvent(snapshot),
               ],
             );
           },
@@ -134,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                               actions: <Widget>[
                                 ElevatedButton.icon(
                                   onPressed: () async {
-                                    
+                                    snapshot.delete(doc.id);
                                     Navigator.of(context).pop();
                                   },
                                   label: const Text('Delete'),
@@ -145,7 +143,8 @@ class _HomePageState extends State<HomePage> {
                                               Colors.red)),
                                 ),
                                 OutlinedButton.icon(
-                                  onPressed: () {
+                                  onPressed: () async {
+                                    snapshot.delete(doc.id);
                                     Navigator.of(context).pop();
                                   },
                                   icon: const Icon(Icons.cancel),

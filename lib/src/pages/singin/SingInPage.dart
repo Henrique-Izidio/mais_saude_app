@@ -5,28 +5,25 @@ import 'package:mais_saude_app/src/servises/auth_services.dart';
 import 'package:mais_saude_app/src/widgets/separator.dart';
 import 'package:provider/provider.dart';
 
-class SingUp extends StatefulWidget {
-  const SingUp({Key? key}) : super(key: key);
+class SingInPage extends StatefulWidget {
+  const SingInPage({Key? key}) : super(key: key);
 
   @override
-  State<SingUp> createState() => _SingUpState();
+  State<SingInPage> createState() => _SingInPageState();
 }
 
-class _SingUpState extends State<SingUp> {
-  final GlobalKey<FormState> _singUpKey = GlobalKey<FormState>();
-
-  final name = TextEditingController();
+class _SingInPageState extends State<SingInPage> {
+  final GlobalKey<FormState> _singInKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
 
-  singUp() async {
+  singIn() async {
     try {
-      await context
-          .read<AuthServices>()
-          .singUpAction(email.text, password.text, name.text);
+      await context.read<AuthServices>().singInAction(email.text, password.text);
     } on AuthException catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.mensage)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.mensage))
+      );
     }
   }
 
@@ -36,43 +33,23 @@ class _SingUpState extends State<SingUp> {
       body: SingleChildScrollView(
         child: SafeArea(
           child: SizedBox(
-            height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
             child: Padding(
               padding: const EdgeInsets.only(left: 20.0, right: 20.0),
               child: Form(
-                key: _singUpKey,
+                key: _singInKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
-                      'Cadastrar',
+                      'Bem vindo!',
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 35,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 1,
                       ),
-                    ),
-                    const Separator(
-                      isSliver: false,
-                      isColumn: false,
-                      value: 10,
-                    ),
-                    TextFormField(
-                      controller: name,
-                      decoration: InputDecoration(
-                        labelText: 'Nome',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      validator: (nameValue) {
-                        if (nameValue == null || nameValue.isEmpty) {
-                          return 'Preencha seu nome';
-                        }
-                        return null;
-                      },
                     ),
                     const Separator(
                       isSliver: false,
@@ -90,16 +67,13 @@ class _SingUpState extends State<SingUp> {
                       ),
                       validator: (emailValue) {
                         if (emailValue == null || emailValue.isEmpty) {
-                          return 'Preencha com um email valido';
+                          return 'Preencha seu nome';
                         }
                         return null;
                       },
                     ),
                     const Separator(
-                      isSliver: false,
-                      isColumn: false,
-                      value: 10,
-                    ),
+                        isSliver: false, isColumn: false, value: 15),
                     TextFormField(
                       controller: password,
                       obscureText: true,
@@ -119,7 +93,7 @@ class _SingUpState extends State<SingUp> {
                     const Separator(
                       isSliver: false,
                       isColumn: false,
-                      value: 10,
+                      value: 15,
                     ),
                     ElevatedButton(
                       style: ButtonStyle(
@@ -131,27 +105,37 @@ class _SingUpState extends State<SingUp> {
                         ),
                       ),
                       onPressed: () {
-                        if (_singUpKey.currentState!.validate()) {
-                          singUp();
+                        if (_singInKey.currentState!.validate()) {
+                          singIn();
                         }
                       },
                       child: const Padding(
                         padding: EdgeInsets.only(
-                            top: 15, bottom: 15, left: 20, right: 20),
-                        child: Text('Cadastrar'),
+                          top: 15,
+                          bottom: 15,
+                          left: 27,
+                          right: 27,
+                        ),
+                        child: Text('Entrar'),
                       ),
                     ),
-                    TextButton(
-                      child: const Text(
-                        'Já tem cadastro?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('Ainda não tem conta?'),
+                        TextButton(
+                          child: const Text(
+                            'Cadastre-se',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushReplacementNamed('/singUp');
+                          },
                         ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushReplacementNamed('/');
-                      },
+                      ],
                     ),
                   ],
                 ),

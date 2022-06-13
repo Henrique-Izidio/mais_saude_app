@@ -1,8 +1,0 @@
-import 'package:flutter/material.dart';
-
-class UserModel extends ChangeNotifier{
-  late final String email;
-  late final String name;
-  late final String token;
-
-}
