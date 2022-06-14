@@ -20,9 +20,6 @@ class DrawerConstructor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    var userDetails = Provider.of<AuthServices>(context).getDetails();
-    print(userDetails['name']);
-
     return Drawer(
       child: ListView(
         children: [

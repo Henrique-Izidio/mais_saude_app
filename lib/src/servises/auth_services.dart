@@ -69,17 +69,6 @@ class AuthServices extends ChangeNotifier {
     notifyListeners();
   }
 
-  getDetails() {
-    if (usuario != null) {
-      var userDetails = _db
-          .collection('Users')
-          .doc(usuario!.uid)
-          .snapshots()
-          .map((snap) => snap.data());
-    }
-
-  }
-
   authExceptionCheck(eCode) {
     switch (eCode) {
       case 'network-request-failed':
