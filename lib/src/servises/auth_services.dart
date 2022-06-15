@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mais_saude_app/src/database/firestore.dart';
+import 'package:mais_saude_app/src/models/user_model.dart';
 
 class AuthException implements Exception {
   String mensage;
@@ -10,8 +12,9 @@ class AuthException implements Exception {
 class AuthServices extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   User? usuario;
-  bool isLoading = true;
   final _db = DBFirestore.get();
+  bool isLoading = true;
+  var user;
 
   AuthServices() {
     _authCheck();
@@ -29,10 +32,14 @@ class AuthServices extends ChangeNotifier {
 
   singInAction(email, password) async {
     try {
-      await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      await _auth
+          .signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          )
+          .then((uid) => {
+                Fluttertoast.showToast(msg: 'Login bem sucedido'),
+              });
 
       _getUser();
     } on FirebaseAuthException catch (e) {
@@ -42,20 +49,34 @@ class AuthServices extends ChangeNotifier {
 
   singUpAction(email, password, name) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      await _db
-          .collection('Users')
-          .doc(_auth.currentUser?.uid)
-          .set({'name': name});
-
+      await _auth
+          .createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          )
+          .then((value) => {postDatailsToFirestore(name)})
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
       _getUser();
     } on FirebaseAuthException catch (e) {
       authExceptionCheck(e.code);
     }
+  }
+
+  postDatailsToFirestore(name) async {
+    //chamando firestore
+    usuario = _auth.currentUser;
+    //chamado UserModel
+
+    UserModel userModel = UserModel();
+    //enviando os dados
+    userModel.email = usuario!.email;
+    userModel.uid = usuario!.uid;
+    userModel.name = name;
+
+    await _db.collection('Users').doc(usuario!.uid).set(userModel.toMap());
+    Fluttertoast.showToast(msg: 'Cadastro realizado com sucesso!');
   }
 
   singOutAction() async {
