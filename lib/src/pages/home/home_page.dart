@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mais_saude_app/src/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:mais_saude_app/src/pages/event/event_page.dart';
 import 'package:mais_saude_app/src/widgets/carroussel_slider.dart';
-import 'package:mais_saude_app/src/widgets/drawer.dart';
-import 'package:mais_saude_app/src/widgets/separator.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,21 +14,55 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+  var page = 1;
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedUser = UserModel();
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   int currentPage = 1;
 
   Stream<QuerySnapshot> _getList() {
-    return firestore.collection('Events').snapshots();
+    return _firestore.collection('Centers/${loggedUser.myUBS}/Events').snapshots();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("Users")
+        .doc(user!.uid)
+        .get()
+        .then((doc) {
+      loggedUser = UserModel.fromMap(doc.data());
+      setState(() {});
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xF6F6F6ff),
-
-      //* Construtor do menu lateral
-      drawer: const DrawerConstructor(),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            UserAccountsDrawerHeader(
+              accountName: Text('${loggedUser.name}'),
+              accountEmail: Text('${loggedUser.myUBS}'),
+            ),
+            drawerTile(Icons.person, 'Perfil', '/profile'),
+            drawerTile(Icons.settings, 'Configurações', '/settings'),
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Sair'),
+              onTap: () {
+                logout();
+                Navigator.of(context).pushReplacementNamed('/singIn');
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: const Text('Demo'),
         flexibleSpace: Container(
@@ -45,43 +79,56 @@ class _HomePageState extends State<HomePage> {
           builder: (_, snapshot) {
             return CustomScrollView(
               slivers: <Widget>[
-                const Separator(isSliver: true, isColumn: false, value: 15.0),
                 Caroussel(),
-                const Separator(isSliver: true, isColumn: false, value: 15.0),
                 listEvent(snapshot),
               ],
             );
           },
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: currentPage,
-        onTap: (value) {
-          setState(() {
-            currentPage = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.maps_home_work_sharp),
-            label: 'UBS',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Incio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.handshake),
-            label: 'CRASS',
-          )
-        ],
-      ),
+      floatingActionButton: (loggedUser.accesLevel != null)
+          ? (loggedUser.accesLevel! >= 2)
+              ? FloatingActionButton(
+                  child: const Icon(Icons.event),
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/addEvent');
+                  },
+                )
+              : null
+          : null,
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: 1,
+      //   items: const [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.account_circle),
+      //       label: 'perfil',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'inicio',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.settings),
+      //       label: 'configurações',
+      //     ),
+      //   ],
+      // ),
+    );
+  }
+
+  drawerTile(IconData icon, String label, String route){
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(label),
+      onTap: () {
+        Navigator.of(context).pushNamed(route);
+      },
     );
   }
 
 // *area de codigo destinada a criação da lista de
 // *dados a partir do firebase
-  listEvent(snapshot) {
+  listEvent(AsyncSnapshot<QuerySnapshot<Object?>> snapshot) {
     switch (snapshot.connectionState) {
       case ConnectionState.none:
       case ConnectionState.waiting:
@@ -103,7 +150,7 @@ class _HomePageState extends State<HomePage> {
             delegate: SliverChildListDelegate(
               [
                 const Center(
-                  child: Text('nothing to see here'),
+                  child: Text('Não há eventos'),
                 )
               ],
             ),
@@ -114,50 +161,25 @@ class _HomePageState extends State<HomePage> {
             (BuildContext context, int index) {
               if (index < snapshot.data!.docs.length) {
                 final DocumentSnapshot doc = snapshot.data!.docs[index];
+                var date = DateTime.fromMicrosecondsSinceEpoch(doc['date'].microsecondsSinceEpoch);
                 return Card(
                   child: ListTile(
+                    onTap: () {
+                      Navigator.of(context).pushNamed('/eventView', arguments: EventViewArgs(event: doc));
+                    },
                     leading: const CircleAvatar(),
                     title: Text(doc['title']),
-                    subtitle: const Text('teste'),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () async {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text('Delete event'),
-                              content: const Text(
-                                  'Do you want to delete this event? This action cannot be undone.'),
-                              actions: <Widget>[
-                                ElevatedButton.icon(
-                                  onPressed: () async {
-                                    snapshot.delete(doc.id);
-                                    Navigator.of(context).pop();
-                                  },
-                                  label: const Text('Delete'),
-                                  icon: const Icon(Icons.delete_forever),
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all<Color>(
-                                              Colors.red)),
-                                ),
-                                OutlinedButton.icon(
-                                  onPressed: () async {
-                                    snapshot.delete(doc.id);
-                                    Navigator.of(context).pop();
-                                  },
-                                  icon: const Icon(Icons.cancel),
-                                  label: const Text('Cancel'),
-                                  style: TextButton.styleFrom(
-                                      primary: Colors.blue),
-                                )
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
+                    subtitle: Text('${date.day}/${date.month}/${date.year}'),
+                    trailing: (loggedUser.accesLevel != null)
+                    ? (loggedUser.accesLevel! >= 2)
+                        ? IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              dialog(context, doc.id);
+                            },
+                          )
+                        : null
+                    : null,
                   ),
                 );
               }
@@ -166,5 +188,50 @@ class _HomePageState extends State<HomePage> {
           ),
         );
     }
+  }
+
+  dialog(context, id) {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Apagar evento'),
+          content: const Text(
+              'Deseja apagar o evento? está ação nãopode ser desfeita.'),
+          actions: <Widget>[
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _firestore
+                    .collection('Events')
+                    .doc(id)
+                    .delete()
+                    .then((value) {
+                  Fluttertoast.showToast(msg: "Evento excluido");
+                });
+              },
+              label: const Text('Excluir'),
+              icon: const Icon(Icons.delete_forever),
+              style: ButtonStyle(
+                  backgroundColor:
+                      MaterialStateProperty.all<Color>(Colors.red)),
+            ),
+            OutlinedButton.icon(
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+              icon: const Icon(Icons.cancel),
+              label: const Text('Cancelar'),
+              style: TextButton.styleFrom(primary: Colors.blue),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // the logout function
+  Future<void> logout() async {
+    await FirebaseAuth.instance.signOut();
   }
 }

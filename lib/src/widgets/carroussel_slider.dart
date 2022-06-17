@@ -19,20 +19,23 @@ class Caroussel extends StatelessWidget {
     double hSize = wSize <= 300 ? 175 : wSize/3.5;
     return SliverList(
       delegate: SliverChildListDelegate([
-        CarouselSlider(
-          options: CarouselOptions(height: hSize),
-          items: [0, 1, 2].map((currentSlide) {
-            return Builder(builder: (context) {
-              return Container(
-                width: wSize,
-                margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: listSlide[currentSlide],
-                ),
-              );
-            });
-          }).toList(),
+        Padding(
+          padding: const EdgeInsets.only(top: 10, bottom: 20),
+          child: CarouselSlider(
+            options: CarouselOptions(height: hSize),
+            items: [0, 1, 2].map((currentSlide) {
+              return Builder(builder: (context) {
+                return Container(
+                  width: wSize,
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: listSlide[currentSlide],
+                  ),
+                );
+              });
+            }).toList(),
+          ),
         )
       ]),
     );

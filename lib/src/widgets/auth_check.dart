@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mais_saude_app/src/servises/auth_services.dart';
-import 'package:mais_saude_app/src/pages/singin/SingInPage.dart';
+import 'package:mais_saude_app/src/pages/singin/SingIn.dart';
 import 'package:mais_saude_app/src/pages/home/home_page.dart';
 
 class AuthCheck extends StatefulWidget {
@@ -18,7 +18,7 @@ class _AuthCheckState extends State<AuthCheck> {
     if (auth.isLoading) {
       return loading();
     }else if (auth.usuario == null) {
-      return const SingInPage();
+      return const SingIn();
     }else {
       return const HomePage();
     }

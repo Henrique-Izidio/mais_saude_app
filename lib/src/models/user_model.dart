@@ -2,15 +2,19 @@ class UserModel {
   String? uid;
   String? email;
   String? name;
+  String? myUBS;
+  int? accesLevel;
 
-  UserModel({this.uid, this.email, this.name});
+  UserModel({this.uid, this.email, this.name, this.accesLevel, this.myUBS});
 
   //receber dados do firbase
   factory UserModel.fromMap(map){
     return UserModel(
       uid : map['uid'],
       email: map['email'],
-      name: map['name']
+      name: map['name'],
+      accesLevel: map['accessLevel'],
+      myUBS: map['myUBS'],
     );
   }
 
@@ -19,7 +23,9 @@ class UserModel {
     return {
       'uid':uid,
       'email':email,
-      'name':name
+      'name':name,
+      'accessLevel':accesLevel,
+      'myUBS':myUBS,
     };
   }
 }
