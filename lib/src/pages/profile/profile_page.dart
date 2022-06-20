@@ -122,7 +122,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    
     startScreen();
     return Scaffold(
       appBar: AppBar(
