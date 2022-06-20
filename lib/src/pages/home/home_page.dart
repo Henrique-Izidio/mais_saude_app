@@ -51,9 +51,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    var uid = user?.uid;
     FirebaseFirestore.instance
         .collection("Users")
-        .doc(user!.uid)
+        .doc(uid)
         .get()
         .then((doc) async {
       loggedUser = UserModel.fromMap(doc.data());
@@ -108,10 +109,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             builder: (_, snapshot) {
               return NotificationListener<UserScrollNotification>(
                 onNotification: (scroll) {
-                  if(scroll.direction == ScrollDirection.reverse && showFab){
+                  if (scroll.direction == ScrollDirection.reverse && showFab) {
                     _aniController.reverse();
                     showFab = false;
-                  }else if(scroll.direction == ScrollDirection.forward && !showFab){
+                  } else if (scroll.direction == ScrollDirection.forward &&
+                      !showFab) {
                     _aniController.forward();
                     showFab = true;
                   }
@@ -124,7 +126,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         ? listEvent(snapshot)
                         : SliverList(
                             delegate: SliverChildListDelegate([
-                              const Text('Voê não está associado a nenhuma UBS'),
+                              const Text(
+                                  'Voê não está associado a nenhuma UBS'),
                             ]),
                           ),
                   ],
@@ -137,14 +140,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       floatingActionButton: (loggedUser.accesLevel != null)
           ? (loggedUser.accesLevel! == 2)
               ? ScaleTransition(
-                scale: _animation,
-                child: FloatingActionButton(
+                  scale: _animation,
+                  child: FloatingActionButton(
                     child: const Icon(Icons.event),
                     onPressed: () {
                       Navigator.of(context).pushNamed('/addEvent');
                     },
                   ),
-              )
+                )
               : (loggedUser.accesLevel! > 2)
                   ? Column(
                       mainAxisAlignment: MainAxisAlignment.end,

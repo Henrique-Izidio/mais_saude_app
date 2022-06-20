@@ -112,7 +112,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void startScreen() {
-    _firestore.collection("Users").doc(user!.uid).get().then((doc) {
+    var uid = user?.uid;
+    _firestore.collection("Users").doc(uid).get().then((doc) {
       loggedUser = UserModel.fromMap(doc.data());
       getUBS();
       loadProfile();
