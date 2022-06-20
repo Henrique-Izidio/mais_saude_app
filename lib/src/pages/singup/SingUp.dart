@@ -24,13 +24,20 @@ class _SingUpState extends State<SingUp> {
   final GlobalKey<FormState> _singUpKey = GlobalKey<FormState>();
 
   //*controladores dos campos do formulario
+  final susEditingController = TextEditingController();
   final nameEditingController = TextEditingController();
   final emailEditingController = TextEditingController();
   final passwordEditingController = TextEditingController();
   final confirmEditingController = TextEditingController();
-  final dropValue = ValueNotifier('');
+  String? currentUBS;
 
   List<String> itens = <String>['1', '2', '3'];
+
+  @override
+  void initState() {
+    setState(() {});
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +64,36 @@ class _SingUpState extends State<SingUp> {
         prefixIcon: const Icon(Icons.account_circle),
         contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: "Nome",
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+    
+    //*campo do sus
+    final susField = TextFormField(
+      autofocus: false,
+      controller: susEditingController,
+      maxLength: 15,
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        RegExp regex = RegExp(r'^.{15,}$');
+        if (value!.isEmpty) {
+          return ("Este campo não pode ser vazio");
+        }
+        if (!regex.hasMatch(value)) {
+          return ("Número invalido");
+        }
+        return null;
+      },
+      onSaved: (value) {
+        susEditingController.text = value!;
+      },
+      textInputAction: TextInputAction.next,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.credit_card),
+        contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
+        hintText: "Cartão do SUS",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -171,81 +208,84 @@ class _SingUpState extends State<SingUp> {
     );
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: SafeArea(
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-              child: Form(
-                key: _singUpKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Cadastrar',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 35,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    const SizedBox(height: 30),
-                    nameField,
-                    const SizedBox(height: 30),
-                    emailField,
-                    const SizedBox(height: 30),
-                    passwordField,
-                    const SizedBox(height: 30),
-                    confirmField,
-                    const SizedBox(height: 30),
-                    StreamBuilder<QuerySnapshot>(
-                      stream: _getCenters(),
-                      builder: (_, snapshot) {
-                        switch (snapshot.connectionState) {
-                          case ConnectionState.none:
-                          case ConnectionState.waiting:
-                            
-                          case ConnectionState.active:
-                          case ConnectionState.done:
-                            var dropOptions = snapshot.data!.docs;
-                            return ValueListenableBuilder(
-                              valueListenable: dropValue,
-                              builder: (BuildContext context, String value, _) {
-                                return DropdownButton(
-                                  hint: const Text('Escolha sua UBS'),
-                                  value: (value.isEmpty)?null:value,
-                                  onChanged: (escolha) => dropValue.value = escolha.toString(),
-                                  items: dropOptions.map((op) => DropdownMenuItem(
-                                    value: op,
-                                    child: Text(op['name']),
-                                  )).toList(),
-                                );
-                              },
-                            );
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 30),
-                    signUpButton,
-                    const SizedBox(height: 30),
-                    TextButton(
-                      child: const Text(
-                        'Já tem cadastro?',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pushReplacementNamed('/');
-                      },
-                    ),
-                  ],
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+          child: Form(
+            key: _singUpKey,
+            child: ListView(
+              children: [
+                const Text(
+                  'Cadastrar',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 35,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1,
+                  ),
                 ),
-              ),
+                const SizedBox(height: 30),
+                nameField,
+                const SizedBox(height: 30),
+                emailField,
+                const SizedBox(height: 30),
+                susField,
+                const SizedBox(height: 30),
+                passwordField,
+                const SizedBox(height: 30),
+                confirmField,
+                const SizedBox(height: 30),
+                Center(
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('Centers')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return const Text('Carrengando...');
+                      } else {
+                        List<DropdownMenuItem> dropUBSs = [];
+                        for (int i = 0; i < snapshot.data!.docs.length; i++) {
+                          DocumentSnapshot snap = snapshot.data!.docs[i];
+                          dropUBSs.add(DropdownMenuItem(
+                            value: snap.id,
+                            child: Text(snap['name']),
+                          ));
+                        }
+                        return DropdownButton<dynamic>(
+                          items: dropUBSs,
+                          onChanged: (value){
+                            setState(() {
+                              currentUBS = value;
+                            });
+                          },
+                          value: currentUBS,
+                          hint: const Text('Escolha uma UBS'),
+                          isExpanded: false,
+                        );
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 30),
+                signUpButton,
+                const SizedBox(height: 30),
+                TextButton(
+                  child: const Text(
+                    'Já tem cadastro?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.of(context).pushReplacementNamed('/');
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -255,43 +295,45 @@ class _SingUpState extends State<SingUp> {
 
   void signUp(String email, String password) async {
     if (_singUpKey.currentState!.validate()) {
-      try {
-        await _auth
-            .createUserWithEmailAndPassword(email: email, password: password)
-            .then((value) => {postDetailsToFirestore(context)});
-      } on FirebaseAuthException catch (error) {
-        switch (error.code) {
-          case "invalid-email":
-            errorMessage = "Your email address appears to be malformed.";
-            break;
-          case "wrong-password":
-            errorMessage = "Your password is wrong.";
-            break;
-          case "user-not-found":
-            errorMessage = "User with this email doesn't exist.";
-            break;
-          case "user-disabled":
-            errorMessage = "User with this email has been disabled.";
-            break;
-          case "too-many-requests":
-            errorMessage = "Too many requests";
-            break;
-          case "operation-not-allowed":
-            errorMessage = "Signing in with Email and Password is not enabled.";
-            break;
-          default:
-            errorMessage = "An undefined Error happened.";
+      if(currentUBS != null){
+        try {
+          await _auth
+              .createUserWithEmailAndPassword(email: email, password: password)
+              .then((value) => {postDetailsToFirestore(context)});
+        } on FirebaseAuthException catch (error) {
+          switch (error.code) {
+            case "invalid-email":
+              errorMessage = "Informe um E-Mail valido";
+              break;
+            case "wrong-password":
+              errorMessage = "Senha errada";
+              break;
+            case "user-not-found":
+              errorMessage = "O usuário inoformado não existe";
+              break;
+            case "user-disabled":
+              errorMessage = "Este usuário está desativado";
+              break;
+            case "too-many-requests":
+              errorMessage = "Entrada temporariamente bloqueada";
+              break;
+            case "operation-not-allowed":
+              errorMessage = "Não é possivel entrar. Tente outra forma";
+              break;
+            case "email-already-in-use":
+              errorMessage = "Este E-Mail já está sendo usado";
+              break;
+            default:
+              errorMessage = "Ocorreu um erro desconhecido";
+          }
+          Fluttertoast.showToast(msg: errorMessage!);
+          debugPrint(error.code);
         }
-        Fluttertoast.showToast(msg: errorMessage!);
-        print(error.code);
       }
     }
   }
 
   postDetailsToFirestore(context) async {
-    // calling our firestore
-    // calling our user model
-    // sedning these values
 
     User? user = _auth.currentUser;
 
@@ -302,15 +344,12 @@ class _SingUpState extends State<SingUp> {
     userModel.uid = user.uid;
     userModel.name = nameEditingController.text;
     userModel.accesLevel = 1;
-    userModel.myUBS = 'MscI6Dv3KGbHooSbKEZI';
+    userModel.myUBS = currentUBS;
+    userModel.susCard = susEditingController.text;
 
     await _firestore.collection("Users").doc(user.uid).set(userModel.toMap());
-    Fluttertoast.showToast(msg: "Account created successfully :) ");
+    Fluttertoast.showToast(msg: "Conta criada com sucesso");
 
     Navigator.of(context).pushReplacementNamed('/home');
-  }
-
-  _getCenters() {
-    return _firestore.collection('Centers').snapshots();
   }
 }

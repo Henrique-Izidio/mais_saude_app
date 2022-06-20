@@ -3,29 +3,40 @@ class UserModel {
   String? email;
   String? name;
   String? myUBS;
+  String? profileUrl;
+  String? susCard;
   int? accesLevel;
 
-  UserModel({this.uid, this.email, this.name, this.accesLevel, this.myUBS});
+  UserModel({
+    this.uid,
+    this.email,
+    this.name,
+    this.accesLevel,
+    this.myUBS,
+    this.susCard,
+  });
 
   //receber dados do firbase
-  factory UserModel.fromMap(map){
+  factory UserModel.fromMap(doc) {
     return UserModel(
-      uid : map['uid'],
-      email: map['email'],
-      name: map['name'],
-      accesLevel: map['accessLevel'],
-      myUBS: map['myUBS'],
+      uid: doc['uid'],
+      email: doc['email'],
+      name: doc['name'],
+      accesLevel: doc['accessLevel'],
+      myUBS: doc['myUBS'],
+      susCard: doc['susCard'],
     );
   }
 
   //enviar dados ao firebase
-  Map<String, dynamic> toMap(){
+  Map<String, dynamic> toMap() {
     return {
-      'uid':uid,
-      'email':email,
-      'name':name,
-      'accessLevel':accesLevel,
-      'myUBS':myUBS,
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'accessLevel': accesLevel,
+      'myUBS': myUBS,
+      'susCard': susCard,
     };
   }
 }

@@ -10,9 +10,7 @@ class EventViewArgs {
 
 class EventView extends StatelessWidget {
   static const routeName = '/eventView';
-  const EventView({
-    Key? key,
-  }) : super(key: key);
+  const EventView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -51,13 +49,14 @@ class EventView extends StatelessWidget {
                 ),
                 Text(
                   '${date.day}/${date.month}/${date.year}',
-                  style: TextStyle(fontSize: 18),
+                  style: const TextStyle(fontSize: 18),
                 ),
               ],
             ),
           ),
           const Padding(
-            padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 5, top: 10),
+            padding:
+                EdgeInsets.only(left: 10.0, right: 10.0, bottom: 5, top: 10),
             child: Text(
               'Descrição',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

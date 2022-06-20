@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/rendering.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mais_saude_app/src/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +14,19 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+  //*Animation
+  bool showFab = true;
+  late final _aniController = AnimationController(
+    duration: const Duration(milliseconds: 400),
+    vsync: this,
+  )..forward();
+
+  late final _animation = CurvedAnimation(
+    parent: _aniController,
+    curve: Curves.fastOutSlowIn,
+  );
+
   var page = 1;
   User? user = FirebaseAuth.instance.currentUser;
   UserModel loggedUser = UserModel();
@@ -23,7 +36,16 @@ class _HomePageState extends State<HomePage> {
   int currentPage = 1;
 
   Stream<QuerySnapshot> _getList() {
-    return _firestore.collection('Centers/${loggedUser.myUBS}/Events').snapshots();
+    return _firestore
+        .collection('Centers/${loggedUser.myUBS}/Events')
+        .snapshots();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _aniController.dispose();
+    _animation.dispose();
   }
 
   @override
@@ -33,7 +55,7 @@ class _HomePageState extends State<HomePage> {
         .collection("Users")
         .doc(user!.uid)
         .get()
-        .then((doc) {
+        .then((doc) async {
       loggedUser = UserModel.fromMap(doc.data());
       setState(() {});
     });
@@ -48,10 +70,10 @@ class _HomePageState extends State<HomePage> {
           children: [
             UserAccountsDrawerHeader(
               accountName: Text('${loggedUser.name}'),
-              accountEmail: Text('${loggedUser.myUBS}'),
+              accountEmail: Text('${loggedUser.email}'),
             ),
             drawerTile(Icons.person, 'Perfil', '/profile'),
-            drawerTile(Icons.settings, 'Configurações', '/settings'),
+            // drawerTile(Icons.emergency, 'UBSs', '/ubsList'),
             ListTile(
               leading: const Icon(Icons.logout),
               title: const Text('Sair'),
@@ -63,60 +85,91 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      appBar: AppBar(
-        title: const Text('Demo'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0x02c8ffff), Color(0x03CBFFff)],
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) =>
+            [
+          SliverAppBar(
+            title: const Text('+Saúde'),
+            snap: true,
+            floating: true,
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0x02c8ffff), Color(0x03CBFFff)],
+                ),
+              ),
             ),
+          )
+        ],
+        body: SafeArea(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: _getList(),
+            builder: (_, snapshot) {
+              return NotificationListener<UserScrollNotification>(
+                onNotification: (scroll) {
+                  if(scroll.direction == ScrollDirection.reverse && showFab){
+                    _aniController.reverse();
+                    showFab = false;
+                  }else if(scroll.direction == ScrollDirection.forward && !showFab){
+                    _aniController.forward();
+                    showFab = true;
+                  }
+                  return true;
+                },
+                child: CustomScrollView(
+                  slivers: <Widget>[
+                    Caroussel(),
+                    (loggedUser.myUBS != null)
+                        ? listEvent(snapshot)
+                        : SliverList(
+                            delegate: SliverChildListDelegate([
+                              const Text('Voê não está associado a nenhuma UBS'),
+                            ]),
+                          ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
       ),
-      body: SafeArea(
-        child: StreamBuilder<QuerySnapshot>(
-          stream: _getList(),
-          builder: (_, snapshot) {
-            return CustomScrollView(
-              slivers: <Widget>[
-                Caroussel(),
-                listEvent(snapshot),
-              ],
-            );
-          },
-        ),
-      ),
       floatingActionButton: (loggedUser.accesLevel != null)
-          ? (loggedUser.accesLevel! >= 2)
-              ? FloatingActionButton(
-                  child: const Icon(Icons.event),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/addEvent');
-                  },
-                )
-              : null
+          ? (loggedUser.accesLevel! == 2)
+              ? ScaleTransition(
+                scale: _animation,
+                child: FloatingActionButton(
+                    child: const Icon(Icons.event),
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/addEvent');
+                    },
+                  ),
+              )
+              : (loggedUser.accesLevel! > 2)
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                          FloatingActionButton(
+                            child: const Icon(Icons.event),
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/addEvent');
+                            },
+                          ),
+                          const SizedBox(height: 10),
+                          FloatingActionButton(
+                            child: const Icon(Icons.emergency),
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/ubsList');
+                            },
+                          )
+                        ])
+                  : null
           : null,
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: 1,
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.account_circle),
-      //       label: 'perfil',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'inicio',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.settings),
-      //       label: 'configurações',
-      //     ),
-      //   ],
-      // ),
     );
   }
 
-  drawerTile(IconData icon, String label, String route){
+  drawerTile(IconData icon, String label, String route) {
     return ListTile(
       leading: Icon(icon),
       title: Text(label),
@@ -161,25 +214,27 @@ class _HomePageState extends State<HomePage> {
             (BuildContext context, int index) {
               if (index < snapshot.data!.docs.length) {
                 final DocumentSnapshot doc = snapshot.data!.docs[index];
-                var date = DateTime.fromMicrosecondsSinceEpoch(doc['date'].microsecondsSinceEpoch);
+                var date = DateTime.fromMicrosecondsSinceEpoch(
+                    doc['date'].microsecondsSinceEpoch);
                 return Card(
                   child: ListTile(
                     onTap: () {
-                      Navigator.of(context).pushNamed('/eventView', arguments: EventViewArgs(event: doc));
+                      Navigator.of(context).pushNamed('/eventView',
+                          arguments: EventViewArgs(event: doc));
                     },
                     leading: const CircleAvatar(),
                     title: Text(doc['title']),
                     subtitle: Text('${date.day}/${date.month}/${date.year}'),
                     trailing: (loggedUser.accesLevel != null)
-                    ? (loggedUser.accesLevel! >= 2)
-                        ? IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () async {
-                              dialog(context, doc.id);
-                            },
-                          )
-                        : null
-                    : null,
+                        ? (loggedUser.accesLevel! >= 2)
+                            ? IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () async {
+                                  dialog(context, doc.id);
+                                },
+                              )
+                            : null
+                        : null,
                   ),
                 );
               }

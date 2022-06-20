@@ -27,7 +27,6 @@ class _SingInState extends State<SingIn> {
 
   @override
   Widget build(BuildContext context) {
-
     //*email field
     final emailField = TextFormField(
       autofocus: false,
@@ -48,7 +47,10 @@ class _SingInState extends State<SingIn> {
       },
       textInputAction: TextInputAction.next,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.person, color: Colors.white,),
+        prefixIcon: const Icon(
+          Icons.person,
+          color: Colors.white,
+        ),
         contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: "E-mail",
         border: OutlineInputBorder(
@@ -77,8 +79,11 @@ class _SingInState extends State<SingIn> {
       },
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
+        prefixIcon: const Icon(
+          Icons.lock_rounded,
+          color: Colors.white,
+        ),
         fillColor: Colors.white,
-        prefixIcon: const Icon(Icons.lock_rounded, color: Colors.white,),
         contentPadding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
         hintText: "Senha",
         border: OutlineInputBorder(
@@ -94,7 +99,7 @@ class _SingInState extends State<SingIn> {
       color: Colors.white,
       child: MaterialButton(
         padding: const EdgeInsets.fromLTRB(20, 15, 20, 15),
-        minWidth: MediaQuery.of(context).size.width-100,
+        minWidth: MediaQuery.of(context).size.width - 100,
         onPressed: () {
           signIn(emailController.text, passwordController.text);
         },
@@ -113,12 +118,8 @@ class _SingInState extends State<SingIn> {
       backgroundColor: const Color.fromRGBO(2, 200, 255, 1),
       body: Center(
         child: Container(
-          margin: const EdgeInsets.only(
-            left: 30,
-            top: 60,
-            right: 30,
-            bottom: 60,
-          ),
+          margin:
+              const EdgeInsets.only(left: 30, top: 60, right: 30, bottom: 60),
           height: double.infinity,
           width: double.infinity,
           decoration: BoxDecoration(
@@ -139,60 +140,55 @@ class _SingInState extends State<SingIn> {
               ),
             ],
           ),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _singInKey,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0, bottom: 8.0),
-                      child: Text(
-                        'Faça seu login',
-                        style: GoogleFonts.montserrat(
-                          fontSize: 24,
+          child: Form(
+            key: _singInKey,
+            child: Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 10),
+              child: ListView(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 15.0, bottom: 8.0),
+                    child: Text(
+                      'Faça seu login',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.montserrat(
+                        fontSize: 24,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  emailField,
+                  const SizedBox(height: 30),
+                  passwordField,
+                  const SizedBox(height: 30),
+                  sendButton,
+                  const SizedBox(height: 30),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Ainda não tem conta?',
+                        style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    emailField,
-                    const SizedBox(height: 30),
-                    passwordField,
-                    const SizedBox(height: 30),
-                    
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        sendButton,
-                      ],
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('Ainda não tem conta?'),
-                        TextButton(
-                          child: const Text(
-                            'Cadastre-se',
-                            style: TextStyle(
+                      TextButton(
+                        child: const Text(
+                          'Cadastre-se',
+                          style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Color.fromRGBO(26, 71, 137, 1),
-                              decoration: TextDecoration.underline
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pushReplacementNamed('/singUp');
-                          },
+                              decoration: TextDecoration.underline),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                        onPressed: () {
+                          Navigator.of(context).pushReplacementNamed('/singUp');
+                        },
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),
@@ -238,7 +234,7 @@ class _SingInState extends State<SingIn> {
             errorMessage = "An undefined Error happened.";
         }
         Fluttertoast.showToast(msg: errorMessage!);
-        print(error.code);
+        debugPrint(error.code);
       }
     }
   }

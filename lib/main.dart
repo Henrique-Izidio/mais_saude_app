@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 //*Firebase packages
 import 'package:firebase_core/firebase_core.dart';
+import 'package:mais_saude_app/config/hiveConfig.dart';
 
 //*App packages
 import 'package:mais_saude_app/firebase_options.dart';
@@ -13,6 +14,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await HiveConfig.start();
   runApp(const AppWidget());
 }
 

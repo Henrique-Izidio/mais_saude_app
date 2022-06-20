@@ -15,13 +15,17 @@ dependencies:
   cupertino_icons: ^1.0.2
   carousel_slider: ^4.1.1
   provider: ^6.0.3
-  shared_preferences: ^2.0.15
   google_fonts: ^3.0.1
   fluttertoast: ^8.0.9
+  image_picker: ^0.8.5+3
+  hive: ^2.2.2
+  hive_flutter: ^1.1.0
+  path_provider: ^2.0.11
 
   firebase_core: ^1.17.1
   firebase_auth: ^3.3.19
   cloud_firestore: ^3.1.17
+  firebase_storage: ^10.2.18
 
 dev_dependencies:
   flutter_test:
@@ -33,5 +37,5 @@ flutter:
 
   uses-material-design: true
 
-  #*assets:
-    #- url asset
+  assets:
+    - assets/images/

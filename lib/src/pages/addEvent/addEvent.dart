@@ -1,6 +1,8 @@
 // ignore_for_file: file_names
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mais_saude_app/src/models/user_model.dart';
 
 class AddEvent extends StatefulWidget {
   const AddEvent({Key? key}) : super(key: key);
@@ -10,6 +12,10 @@ class AddEvent extends StatefulWidget {
 }
 
 class _AddEventState extends State<AddEvent> {
+
+  User? user = FirebaseAuth.instance.currentUser;
+  UserModel loggedUser = UserModel();
+
   //* Firestore
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Timestamp? eventDate;
@@ -24,6 +30,19 @@ class _AddEventState extends State<AddEvent> {
   final eventDescription = TextEditingController();
   DateTime date = DateTime.now();
   TimeOfDay time = TimeOfDay.now();
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseFirestore.instance
+        .collection("Users")
+        .doc(user!.uid)
+        .get()
+        .then((doc) {
+      loggedUser = UserModel.fromMap(doc.data());
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +119,12 @@ class _AddEventState extends State<AddEvent> {
                   onPressed: () async {
                     eventDate = Timestamp.fromDate(date);
                     publicationMoment = Timestamp.fromDate(DateTime.now());
-                    await _firestore.collection("Events").doc().set({
+                    await _firestore.collection("Centers/${loggedUser.myUBS}/Events").doc().set({
                       'title': eventTitle.text,
                       'description': eventDescription.text,
                       'date': eventDate,
                       'publication': publicationMoment,
-                    });
-                    Navigator.of(context).pop();
+                    }).then((value) => Navigator.pop(context));
                   },
                   child: const Padding(
                     padding: EdgeInsets.all(10.0),

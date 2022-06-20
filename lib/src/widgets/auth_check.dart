@@ -25,8 +25,13 @@ class _AuthCheckState extends State<AuthCheck> {
   }
 
   loading(){
-    return const Scaffold(
-      body: Center(child: CircularProgressIndicator())
+    return Scaffold(
+      body: Center(child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: const [
+          CircularProgressIndicator(),
+        ],
+      ),),
     );
   }
 }
