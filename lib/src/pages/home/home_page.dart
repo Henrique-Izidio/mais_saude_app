@@ -51,8 +51,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    var uid = user?.uid;
-    FirebaseFirestore.instance
+    start();
+  }
+
+  start() async {
+    String? uid = user?.uid;
+    await _firestore
         .collection("Users")
         .doc(uid)
         .get()

@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   getImage() async {
     final ImagePicker picker = ImagePicker();
-    var image = await picker.pickImage(source: ImageSource.gallery);
+    XFile? image = await picker.pickImage(source: ImageSource.gallery);
     return image;
   }
 
@@ -69,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   pickAndUploadImage() async {
-    XFile? file = await getImage();
+    File? file = await getImage();
     if (file != null) {
       UploadTask task = await upload(file.path);
 
@@ -107,10 +107,27 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   getUBS() async {
-    final snapshot = await _firestore.collection('Centers').doc(loggedUser.myUBS).get();
+    final snapshot =
+        await _firestore.collection('Centers').doc(loggedUser.myUBS).get();
     ubsName = await snapshot.get('name');
   }
 
+
+  @override
+  void initState() {
+    super.initState();
+    var uid = user?.uid;
+    _firestore
+        .collection("Users")
+        .doc(uid)
+        .get()
+        .then((doc) async {
+      loggedUser = UserModel.fromMap(doc.data());
+      getUBS();
+      loadProfile();
+      setState(() {});
+    });
+  }
   void startScreen() {
     var uid = user?.uid;
     _firestore.collection("Users").doc(uid).get().then((doc) {
@@ -123,7 +140,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    startScreen();
+    // startScreen();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Perfil'),
@@ -171,6 +188,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   Divider(height: 30, thickness: 2, color: Colors.blue[200]),
                   profileLabel(Icons.emergency, 'UBS'),
                   profileField(ubsName),
+                  Divider(height: 30, thickness: 2, color: Colors.blue[200]),
+                  OutlinedButton(
+                    onPressed: () {
+                      user?.delete();
+                    },
+                    child: const Text('Deletar conta'),
+                  ),
                 ],
               ),
               if (uploading)
